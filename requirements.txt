@@ -1,0 +1,14 @@
+# Core (verified against conda env `gmnet`: torch 2.5.1+cu121, RTX 4090)
+torch>=2.0
+numpy>=1.24
+opencv-python>=4.5
+colour-science>=0.4.4   # ICtCp / Delta E_ITP, RGB primary conversions
+PyYAML>=6.0
+imageio>=2.30
+scipy>=1.10
+# Optional (graceful fallbacks provided if missing):
+#   tqdm            progress bars
+#   thop            alternative FLOPs counter
+#   matplotlib      Q_max distribution / curve plotting
+# HDR-VDP-3 is a MATLAB toolbox (Mantiuk et al.); register a Python wrapper via
+#   fastgamer.metrics.register_hdr_vdp3(fn)  to enable that column.

@@ -1,0 +1,52 @@
+# FastGaMer (CVPR 2026) reproduction config -- values anchored to the paper.
+name: fastgamer
+
+model:
+  in_nc: 3
+  out_nc: 3            # three-channel COLOR gain map (vs GMNet's single channel)
+  feat_dim: 64         # dimension of the global feature F_thumb
+  thumb_size: 256      # thumbnail resolution (Sec. 3)
+  num_grids: 3         # K bilateral grids (Sec. 3.2)
+  grid_size: 8         # Nb (Sec. 3.2)
+  lut_dim: 17          # Nt, 3D LUT resolution (Sec. 3.3)
+  enc_widths: [16, 32, 48, 64, 64]
+  hidden_scale: 32
+  hidden_grid: 32
+  hidden_lut: 32
+  hidden_mod: 32
+  gamma: 2.2           # Eq. 2
+  offset: 0.015625     # 1/64, Eq. 2
+
+data:
+  root: ./datasets/fastgamer     # produced by scripts/make_dataset.py
+  mode: sdr_hdr                   # 'sdr_hdr' | 'sdr_gm'
+  patch_size: 256                # 256x256 random crops (Sec. 4)
+  thumb_size: 256
+  augment: true                  # random horizontal flips + rotations
+  num_workers: 4
+
+train:
+  batch_size: 16                 # Sec. 4 (NVIDIA V100)
+  lr: 2.0e-4                     # initial learning rate (Sec. 4)
+  betas: [0.9, 0.99]             # Adam beta1/beta2 (Sec. 4)
+  weight_decay: 0.0
+  niter: 1000000                 # total iterations
+  lr_scheme: MultiStepLR         # decay x0.5 at the milestones below, no warm-up
+  lr_steps: [200000, 400000, 600000, 800000]
+  lr_gamma: 0.5
+  lambda1: 3.0                   # weight on || GM_pred - GM_gt ||_1 (Eq. 5)
+  lambda2: 0.1                   # weight on (Ls + Lm) LUT regularizers (Eq. 5)
+  seed: 10
+  print_freq: 100
+  save_freq: 10000
+  val_freq: 10000
+
+path:
+  experiments_root: ./experiments
+  pretrain: null
+  resume: null
+
+test:
+  ckpt: null
+  save_images: true
+  with_hdrvdp: false
